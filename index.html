@@ -465,7 +465,7 @@
         <div class="flex items-center justify-between">
           <a href="#" class="text-3xl font-['Pacifico'] text-primary"
             ><img
-              class="w-48 h-auto md:w-48 sm:w-36 w-32"
+              class="w-48 h-auto md:w-48 sm:w-36 w-24"
               src="images/ol.png"
               alt="Outview Design Logo"
               srcset=""
@@ -629,15 +629,11 @@
             </p>
             <div class="grid grid-cols-2 gap-8">
               <div class="text-lrft">
-                <span class="text-4xl font-bold text-primary block mb-2"
-                  >1000+</span
-                >
+                <span class="text-4xl font-bold text-primary block mb-2 stats-number" data-target="1000">0</span>
                 <span class="text-gray-400">Projects Completed</span>
               </div>
               <div class="text-left">
-                <span class="text-4xl font-bold text-primary block mb-2"
-                  >99%</span
-                >
+                <span class="text-4xl font-bold text-primary block mb-2 stats-number" data-target="99">0</span>
                 <span class="text-gray-400">Client Satisfaction</span>
               </div>
             </div>
@@ -1118,9 +1114,9 @@
           <div>
             <a href="#" class="text-3xl text-primary"
             ><img
-              class="w-36 h-auto"
+              class="w-36 h-auto md:w-36 sm:w-28 w-20"
               src="images/ol.png"
-              alt=""
+              alt="Outview Design Logo"
               srcset=""
           /></a>
             <p class="text-gray-400">
@@ -1213,7 +1209,38 @@
         });
       });
 
+      // Animated counting for statistics
+      function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          const currentValue = Math.floor(progress * (end - start) + start);
+          element.textContent = currentValue + (element.dataset.target === "1000" ? "+" : "%");
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          }
+        };
+        window.requestAnimationFrame(step);
+      }
 
+      // Intersection Observer for stats animation
+      const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = parseInt(entry.target.dataset.target);
+            animateValue(entry.target, 0, target, 2000);
+            statsObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.5
+      });
+
+      // Observe all stats numbers
+      document.querySelectorAll('.stats-number').forEach(el => {
+        statsObserver.observe(el);
+      });
 
       // Enhanced scroll animations
       const enhancedObserverOptions = {
@@ -1233,25 +1260,6 @@
           }
         });
       }, enhancedObserverOptions);
-
-      // Animate numbers
-      function animateValue(element, start, end, duration) {
-        let startTimestamp = null;
-        const step = (timestamp) => {
-          if (!startTimestamp) startTimestamp = timestamp;
-          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-          element.textContent = Math.floor(progress * (end - start) + start);
-          if (progress < 1) {
-            window.requestAnimationFrame(step);
-          }
-        };
-        window.requestAnimationFrame(step);
-      }
-
-      // Observe all elements that need animation
-      document.querySelectorAll('.service-card, .client-card, .works-item, .contact-form, .feature-card, .stats-number').forEach(el => {
-        enhancedObserver.observe(el);
-      });
 
       // Add hover effect to section titles
       document.querySelectorAll('h2.section-title').forEach(title => {
